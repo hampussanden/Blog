@@ -1,0 +1,16 @@
+---
+import { HOMEPAGE_URL } from '../config'
+import InkdropLogo from './icons/inkdrop-logo'
+
+const today = new Date()
+---
+
+<footer class="p-4">
+  <div class="text-zinc-500 text-center">
+    &copy; {today.getFullYear()}
+    <a href={HOMEPAGE_URL}>Hampus Sandén</a>. All rights reserved.
+  </div>
+  <div class="flex items-center justify-center text-center mt-4 gap-1">
+    <span class="text-xs opacity-50">Powered by Astro</span>
+  </div>
+</footer>

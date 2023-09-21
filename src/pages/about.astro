@@ -1,0 +1,169 @@
+---
+import BaseHead from '../components/BaseHead.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import { SITE_TITLE, SITE_DESCRIPTION, HOMEPAGE_URL } from '../config'
+import Body from '../components/Body.astro'
+import Content from '../components/Content.astro'
+import { IoArrowForward, IoChevronForward } from 'react-icons/io5/index.js'
+import TimeLineElement from "../components/TimeLine.astro";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <Body>
+    <Header title={SITE_TITLE} />
+    <main class="pt-[56px]">
+      <Content>
+        <div class="mb-5">
+            <div class="text-4xl w-full font-bold">About</div>
+          </div>
+        
+          <div class="mb-10 text-justify">
+            My name is Hampus Sandén and I have 10+ years experience working with digital marketing. In 2017 I co-founded the award winning agency 56K digital and it has since grown to one of the most respected digital marketing agencies in Stockholm, Sweden. 
+            <br>
+            <br>
+            In 2023 I decided that it was time for me to take a step back as a board member of 56K digital and give myself the room to grow in a direction that suits me better. In the fall of 2023 I started to offer my services as a freelancing consultant.
+            <br>
+            <br>
+            As a freelancer I want to focus on what got me into consultancy from the beginning, and that is working hands-on with digital marketing. I want to build further upon my strategic and technical background and continue to learn from others and share all that I have learned throughout the years.
+          </div>
+
+          <div class="mb-5">
+            <div class="text-3xl w-full font-bold">Expertise</div>
+          </div>
+        
+          <div class="mb-10 text-justify">
+            Over the years I have worked in many different roles but I feel most grounded in the role as a Data Analyst. I have a deep knowledge of many of the services that are included in the <a href="https://marketingplatform.google.com/" target="_blank" class="underline underline-offset-2 text-indigo-600 dark:text-indigo-400 decoration-indigo-400 dark:decoration-indigo-600">Google Marketing</a>- and <a href="https://cloud.google.com/" target="_blank" class="underline underline-offset-2 text-indigo-600 dark:text-indigo-400 decoration-indigo-400 dark:decoration-indigo-600">Google Cloud Platform</a> stack. Over these past years I have found myself leaning more and more towards Google Cloud Platform and today I focus mostly on these products and work with integrating the Google Marketing stack with Google Cloud.
+            <br>
+            <br>
+            I have the proven ability to implement, extract, process, store, analyse and visualise data across many different tools and I care for user privacy. I believe that you can do great marketing without intruding on user privacy and have worked a lot these past years with GDPR related questions with some of Sweden's biggest brands.
+          </div>
+          <!-- 
+          <ul class="list-disc md:columns-2 columns-2 mx-6 mb-10">
+            <li>Hard skills</li>
+            <li>Hard skills</li>
+            <li>Hard skills</li>
+            <li>Soft skills</li>
+            <li>Soft skills</li>
+            <li>Soft skills</li>
+          </ul>
+          -->
+        
+          <div class="mb-5">
+            <div class="text-3xl w-full font-bold">Experience</div>
+          </div>
+        
+          <div class="time-line-container mb-10">
+            <TimeLineElement
+              title="Freelance Consultant"
+              subtitle="From Oct 2023 to Present at Freelance, Stockholm, Sweden"
+            >
+            </TimeLineElement>
+            
+            <TimeLineElement
+              title="Founding Partner"
+              subtitle="From Jan 2017 to Oct 2023 at 56K digital, Stockholm, Sweden"
+            >
+            As one of the four founders of 56K digital my role changed over the years but I was always part of our analytics team and for a couple of years I was the Team Lead overlooking all our consultants' daily work. Below is a sample of what i did over the years:
+    
+            <ul class="list-disc mx-6 grid gap-2 mt-10">
+              <li>Built and managed a modern data data stack using; Google Cloud, Airbyte, dbt, Airflow, BigQuery and Data Studio.</li>
+              <li>Built and managed a Customer Lifetime Value model using AI platform on Google Cloud. Other tools included; BigQuery, Airflow (Cloud Composer), Cloud Storage and Cloud Functions</li>
+              <li>Wrote requirements, implemented tracking and documentation for several tools; Google Tag Manager, Google Analytics Universal, Google Analytics 4, Google Ads, Facebook Ads, Display & Video 360 etc.</li>
+              <li>Built several internal tools to be used by our consultants; Fully working ecommerce website for testing, Fully working cookie consent from different vendors, Automated feed solution for Google Ads, Merchant centre feeds, Google Ads anomaly detection tool.</li>
+              <li>Was responsible for all internal documentation in the analytics team and made sure that our consultants had the latest recommended implementations; Google Tag Manager, Data Layer, Cookie Consent and GDPR.</li>
+            </ul>
+
+            </TimeLineElement>
+            
+            <TimeLineElement
+              title="Web Analytics Consultant"
+              subtitle="From Feb 2016 to Jan 2017 at iProspect, Stockholm, Sweden"
+            >
+            </TimeLineElement>
+            
+            <TimeLineElement
+              title="Search Engine Optimization Consultant"
+              subtitle="From Mar 2015 to Feb 2016 at iProspect, Stockholm, Sweden"
+            >
+            </TimeLineElement>
+            
+            <TimeLineElement
+              title="Digital Specialist"
+              subtitle="From Feb 2014 to Mar 2015 at Keybroker, Stockholm, Sweden"
+            >
+            </TimeLineElement>
+            
+          </div>
+
+          <div class="mb-5">
+            <div class="text-3xl w-full font-bold">Education</div>
+          </div>
+        
+          <div class="time-line-container grid gap-4 mb-10">
+            <TimeLineElement
+              title="Higher Vocational Education (HVE), Online Marketing"
+              subtitle="From 2013 to 2014 at Medieinstitutet, Stockholm, Sweden"
+            >
+            The education in Online Marketing gave me a deep understanding of the underlying strategic work within digital marketing. During these two years I got a good understanding of many different tools and strategic methods to be able to take the company's digital presence and communication all the way from strategy to conversion and optimisation.
+            
+            <ul class="list-disc mx-6 grid gap-2 mt-10">
+              <li>Business Plans, Presentation Skills, Brainstorming Techniques</li>
+              <li>Web Development: HTML, CSS, JavaScript, SQL</li>
+              <li>Online Marketing: SEO, SEM, PPC Advertising (Google Ads, Facebook Ads, etc.)</li>
+              <li>Analytics: Data Visualisation, Web Analytics (Google Analytics, Adobe Analytics, Google Tag Manager)</li>
+              <li>Social Media: Campaigns, Branding, Personal Branding, Customer Care</li>
+              <li>Digital Advertising: Programmatic Buying, Real-Time Bidding, Retargeting</li>
+              <li>Ecommerce, CRM</li>
+            </ul>
+
+            </TimeLineElement>
+          </div>
+        
+          <div class="mb-5">
+            <div class="text-3xl w-full font-bold">Certifications</div>
+          </div>
+        
+          <ul class="list-disc mx-6 mb-10 grid gap-2">
+            <li>
+              <a href="https://skillshop.credential.net/de0d6db6-a16b-4a6f-add6-ceaae08094f3" target="_blank"> Google Analytics Individual Qualification</a>
+            </li>
+          </ul>
+        
+          <div class="mb-5">
+            <div class="text-3xl w-full font-bold">Languages</div>
+          </div>
+        
+          <ul class="list-disc md:columns-5 columns-2 mx-6 mb-10">
+            <li>Python</li>
+            <li>JavaScript</li>
+            <li>SQL</li>
+          </ul>
+          
+          <div class="mb-5">
+            <div class="text-3xl w-full font-bold">Tools</div>
+          </div>
+        
+          <ul class="list-disc md:columns-5 columns-2 mx-6 mb-10">
+            <li>Google Cloud</li>
+            <li>Github</li>
+            <li>dbt</li>
+            <li>Airbyte</li>
+            <li>Docker</li>
+            <li>Jupyter</li>
+            <li>Google Analytics 4</li>
+            <li>Google Data Studio</li>
+            <li>Google Ads</li>
+            <li>Google Sheets</li>
+            <li>Apps Script</li>
+          </ul>
+      </Content>
+    </main><a href="/">
+      <Footer />
+    </a><a href="/"> </a>
+  </Body>
+</html>
