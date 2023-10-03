@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696347298861
+updatedAt: 1696348113547
 tags:
   - Google Cloud
   - Airbyte
@@ -14,7 +14,7 @@ layout: ../../layouts/BlogPost.astro
 ---
 Airbyte has quickly become one of the most popular data ingestion tools on the market and it's easy to understand why once you start to get familiar with the tool. Airbyte has hundreds of connectors out of the box, and for any that don’t exist, there's the option to create your own. 
 
-Although Airbyte started out as open-source I would not classify it as fully open-source today. But it still has most of it's flexibility and compared to other competitors like Fivetran and Stitch it's still the tool to use for data ingestion in my opinion. 
+Although Airbyte started out as open-source I would not classify it as fully open-source today. But it is highly flexible and compared to other competitors like Fivetran and Stitch it's the tool to use for data ingestion in my opinion. 
 
 In this post I will cover how to deploy Airbyte to a Compute Engine instance in Google Cloud Platform. The aim is to help you get started as seamlessly as possible and we'll work through the practical example of installing Airbyte as explained in their documentation here, using Terraform to provision everything in Google Cloud. 
 
@@ -778,9 +778,11 @@ Use the following command to suspend your instance or see the [documentation](ht
 ## FAQ
 
 ### How much will this setup cost?
+
 Here is the [Google Compute Engine pricing](https://cloud.google.com/compute/all-pricing/) for calculation.
 
 ### What are the risks of having a VM with public IP?
+
 
 ## References
 
