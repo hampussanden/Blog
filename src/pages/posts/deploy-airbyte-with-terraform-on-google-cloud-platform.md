@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696346108364
+updatedAt: 1696347298861
 tags:
   - Google Cloud
   - Airbyte
@@ -781,8 +781,6 @@ Use the following command to suspend your instance or see the [documentation](ht
 Here is the [Google Compute Engine pricing](https://cloud.google.com/compute/all-pricing/) for calculation.
 
 ### What are the risks of having a VM with public IP?
-
-
 
 ## References
 
