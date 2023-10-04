@@ -3,12 +3,12 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696405383799
+updatedAt: 1696409197365
 tags:
   - Google Cloud
   - Airbyte
   - Terraform
-heroImage: /posts/deploy-airbyte-with-terraform-on-google-cloud-platform_thumbnail.png
+heroImage: /posts/deploy-airbyte-with-terraform-on-google-cloud-platform_thumbnail.jpg
 public: true
 layout: ../../layouts/BlogPost.astro
 ---
@@ -18,7 +18,7 @@ In this post I will cover how to deploy Airbyte to a Compute Engine instance in 
 
 The benefit of using Terraform to provision your deployment is that the work you put in will be easily replicable for anyone else who wants to do the same setup.
 
-If you've ever tried to setup Airbyte you know that it's very easy to do and requires zero effort just to get started if you just follow the documentation from start to finish, no matter what method/ provider you choose (AWS, Azure, Google Cloud Platform, Kubernetes etc.). 
+If you've ever tried to setup Airbyte you know that it's very easy to do and requires zero effort just to get started if you just follow the documentation from start to finish, no matter what method/provider you choose (AWS, Azure, Google Cloud Platform, Kubernetes etc.). 
 
 But using a free tool comes with the responsibility of deploying the service to your own environment and Airbytes documentation doesn't go trough all aspects of deploying the tool. Especially the security aspect of running Airbyte on a server which is left to the user to interpret themselves.
 
@@ -32,6 +32,22 @@ The steps shown in the documentation is not meant to show how you get a producti
 In this setup we will use a shielded VM with no public IP address and set up security measures for both ingress and egress traffic to the instance. To be able to access the VM as a user we will set up the correct IAM roles and tunnel the ssh traffic through Identity Aware Proxy which is a authenticating layer that only lets trough authorised users. 
 
 We will also setup a firewall rule to only let in IAP authorised users to our VPC and Subnet. For egress traffic we will setup Cloud NAT and Cloud Router with a static IP so our VM will be able to make outbound calls for example package downloads and have access to Googles internal services.
+
+### Compute Engine
+
+A Shielded VM is a virtual machine instance on Google Cloud Platform (GCP) that incorporates advanced security features to enhance the protection and integrity of workloads. It provides a hardened environment designed to safeguard against various types of attacks and unauthorized access.
+
+### Identity Aware Proxy
+
+Identity Aware Proxy (IAP) is a security feature that enhances the security of applications running on GCP. IAP allows you to control and manage access to your web applications by verifying the identity of users before granting access. It acts as an additional layer of security for applications hosted on GCP by ensuring that only authenticated and authorized users can access them.
+
+### Cloud NAT
+
+Cloud NAT (Network Address Translation) is a service that allows virtual machines (VMs) without external IP addresses to access the internet. It acts as a bridge between private, internal networks and the public internet.
+
+### Cloud Router
+
+Cloud Router is a networking service that allows for dynamic routing within virtual private cloud (VPC) networks. It enables communication between different VPC networks, as well as connections to on-premises networks.
 
 ![Deploy Airbyte with Terraform on Google Cloud Platform](/posts/deploy-airbyte-with-terraform-on-google-cloud-platform_deploy-airbyte-with-terraform-on-google-cloud-platform.png)
 
@@ -415,7 +431,7 @@ Before you start make sure once again that you have the right Google Cloud proje
 gcloud config set project <PROJECT_ID>
 ```
 
-Initialize the backend, validate, and format your configuration.
+First start with initializing the backend.
 
 ```shell
 terraform init
@@ -437,10 +453,14 @@ rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
 
+Then validate your configuration.
+
 ```shell
 terraform validate
 Success! The configuration is valid.
 ```
+
+And format your configuration.
 
 ```shell
 terraform fmt
@@ -448,7 +468,7 @@ main.tf
 provider.tf
 ```
 
-Now go on and create your resources.
+If everything looks good you can go on and create your resources.
 
 ```shell
 terraform apply
@@ -836,6 +856,9 @@ Use the following command to suspend your instance or see the [documentation](ht
 Here is the [Google Compute Engine pricing](https://cloud.google.com/compute/all-pricing/) for calculation.
 
 ### What are the risks of having a VM with public IP?
+
+
+### Is it possible
 
 
 ## References
