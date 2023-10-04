@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696409197365
+updatedAt: 1696415783391
 tags:
   - Google Cloud
   - Airbyte
@@ -14,7 +14,7 @@ layout: ../../layouts/BlogPost.astro
 ---
 Airbyte has quickly become one of the most popular data ingestion tools on the market and it's easy to understand why once you start to get familiar with the tool. Airbyte has hundreds of connectors out of the box, and for the connectors that don't exist, you have the option to create your own. 
 
-In this post I will cover how to deploy Airbyte to a Compute Engine instance in Google Cloud Platform. The goal is to help you get started as seamlessly as possible and we'll work through the practical example of installing Airbyte as explained in their documentation [here](https://docs.airbyte.com/deploying-airbyte/on-gcp-compute-engine/), using Terraform to provision everything in Google Cloud. 
+In this post I will cover how to deploy Airbyte to a Compute Engine instance in Google Cloud Platform. The goal is to help you get started as seamlessly as possible with a production ready instance and we'll work through the practical example of installing Airbyte as explained in their documentation [here](https://docs.airbyte.com/deploying-airbyte/on-gcp-compute-engine/), using Terraform to provision everything in Google Cloud. 
 
 The benefit of using Terraform to provision your deployment is that the work you put in will be easily replicable for anyone else who wants to do the same setup.
 
@@ -29,36 +29,43 @@ The steps shown in the documentation is not meant to show how you get a producti
 
 ## Architecture
 
-In this setup we will use a shielded VM with no public IP address and set up security measures for both ingress and egress traffic to the instance. To be able to access the VM as a user we will set up the correct IAM roles and tunnel the ssh traffic through Identity Aware Proxy which is a authenticating layer that only lets trough authorised users. 
+In this architecture we use a couple of different Google Cloud services to create a secure and scalable environment. 
 
-We will also setup a firewall rule to only let in IAP authorised users to our VPC and Subnet. For egress traffic we will setup Cloud NAT and Cloud Router with a static IP so our VM will be able to make outbound calls for example package downloads and have access to Googles internal services.
+We deploy our (VM) virtual machine with Google Compute Engine, while the services Virtual Private Cloud (VPC), Identity Aware Proxy (IAP), Cloud NAT, and Cloud Router work to enhance security, networking, and accessibility.
 
 ### Compute Engine
 
-A Shielded VM is a virtual machine instance on Google Cloud Platform (GCP) that incorporates advanced security features to enhance the protection and integrity of workloads. It provides a hardened environment designed to safeguard against various types of attacks and unauthorized access.
+Google Compute Engine is a Infrastructure as a Service (IaaS). It enables users to deploy and manage virtual machine (VM) instances in the cloud. Compute Engine provides a scalable and flexible environment for running a wide range of applications.
+
+Our Compute Engine VM instance resides within a Virtual Private Cloud (VPC). Which enables us to create an isolated network environment that we access by the help of Cloud Router. 
+
+We have also divided the VPC into a subnet, with its own IP range and routing configuration. This will help us in the future if we decide to add another VM instance to our VPC.
+
+The VM instance have shielded futures enabled that incorporates advanced security features to enhance the protection and integrity of workloads and the firewall is configured to only let trough users coming from IAP.
+
 
 ### Identity Aware Proxy
 
-Identity Aware Proxy (IAP) is a security feature that enhances the security of applications running on GCP. IAP allows you to control and manage access to your web applications by verifying the identity of users before granting access. It acts as an additional layer of security for applications hosted on GCP by ensuring that only authenticated and authorized users can access them.
+Identity Aware Proxy (IAP) is a security feature that enhances the security of applications running on GCP. IAP allows you to control and manage access to your web applications by verifying the identity of users before granting access. 
+
+It acts as an additional layer of security for applications hosted on GCP by ensuring that only authenticated and authorized users can access them.
 
 ### Cloud NAT
 
-Cloud NAT (Network Address Translation) is a service that allows virtual machines (VMs) without external IP addresses to access the internet. It acts as a bridge between private, internal networks and the public internet.
+Cloud NAT (Network Address Translation) is a service that allows virtual machines VMs without external IP addresses to access the internet. It acts as a bridge between private, internal networks and the public internet.
 
 ### Cloud Router
 
-Cloud Router is a networking service that allows for dynamic routing within virtual private cloud (VPC) networks. It enables communication between different VPC networks, as well as connections to on-premises networks.
+Cloud Router is a networking service that allows for dynamic routing within virtual private cloud VPC networks. It enables communication between different VPC networks, as well as connections to on-premises networks.
 
 ![Deploy Airbyte with Terraform on Google Cloud Platform](/posts/deploy-airbyte-with-terraform-on-google-cloud-platform_deploy-airbyte-with-terraform-on-google-cloud-platform.png)
 
 1. The user clicks the SSH button in the Google Cloud console or use the command `gcloud compute ssh <INSTANCE> --zone <ZONE> --tunnel-through-iap --project <PROJECT_ID>`
 2. The IAP connection authenticates and authorises the user if they have the IAM role `IAP-secured Tunnel User`.
-3. We have created a VPC (Virtual Private Cloud) with a single subnetwork where our instance resides.
-4. A shielded VM with no public IP address.
-5. Firewall to allow SSH connection from IAP. You can read more about it[here](https://cloud.google.com/iap/docs/using-tcp-forwarding).
-6. A Cloud NAT gateway and Cloud router.(It uses the Border Gateway Protocol which advertises fixed IP ranges and serves as a control plane for cloud NAT.)
-7. Allow internal access for Google Services like BigQuery and Cloud Storage.
-8. Outbound internet access for package downloads.
+4. The firewall rules that we have configured only allows SSH connections from IAP. You can read more about it[here](https://cloud.google.com/iap/docs/using-tcp-forwarding).
+5. The Cloud NAT gateway and Cloud router handles internet egress traffic and internal access within Google Cloud.
+6. Which allows us to access Google Services like BigQuery and Cloud Storage.
+7. And outbound internet access for package downloads which Airbyte will need.
 
 ## Prerequisites
 
