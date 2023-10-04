@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696415783391
+updatedAt: 1696430516714
 tags:
   - Google Cloud
   - Airbyte
@@ -14,13 +14,13 @@ layout: ../../layouts/BlogPost.astro
 ---
 Airbyte has quickly become one of the most popular data ingestion tools on the market and it's easy to understand why once you start to get familiar with the tool. Airbyte has hundreds of connectors out of the box, and for the connectors that don't exist, you have the option to create your own. 
 
-In this post I will cover how to deploy Airbyte to a Compute Engine instance in Google Cloud Platform. The goal is to help you get started as seamlessly as possible with a production ready instance and we'll work through the practical example of installing Airbyte as explained in their documentation [here](https://docs.airbyte.com/deploying-airbyte/on-gcp-compute-engine/), using Terraform to provision everything in Google Cloud. 
+In this post I will cover how to deploy Airbyte to a Compute Engine instance on Google Cloud Platform (GCP). The goal is to help you get started as seamlessly as possible with a production ready (VM) virtual machine instance and we'll work through the example of installing Airbyte that is explained in their documentation [here](https://docs.airbyte.com/deploying-airbyte/on-gcp-compute-engine/), using Terraform to provision everything in Google Cloud. 
 
 The benefit of using Terraform to provision your deployment is that the work you put in will be easily replicable for anyone else who wants to do the same setup.
 
-If you've ever tried to setup Airbyte you know that it's very easy to do and requires zero effort just to get started if you just follow the documentation from start to finish, no matter what method/provider you choose (AWS, Azure, Google Cloud Platform, Kubernetes etc.). 
+If you've ever tried to setup Airbyte you know that it's very easy to do and requires zero effort just to get started if you just follow the documentation from start to finish, no matter what method/provider you choose (AWS, Azure, GCP, Kubernetes etc.). 
 
-But using a free tool comes with the responsibility of deploying the service to your own environment and Airbytes documentation doesn't go trough all aspects of deploying the tool. Especially the security aspect of running Airbyte on a server which is left to the user to interpret themselves.
+But using a free tool comes with the responsibility of deploying the service to your own environment and Airbytes documentation doesn't go trough all aspects of deploying the tool. And in this case, especially the security aspect of running Airbyte on a server in the cloud which the user is left to interpret themselves.
 
 If this is your first time setting up Airbyte maybe you will find yourself wondering what you should do next when you see this message at the end of the documentation:
 
@@ -31,17 +31,19 @@ The steps shown in the documentation is not meant to show how you get a producti
 
 In this architecture we use a couple of different Google Cloud services to create a secure and scalable environment. 
 
-We deploy our (VM) virtual machine with Google Compute Engine, while the services Virtual Private Cloud (VPC), Identity Aware Proxy (IAP), Cloud NAT, and Cloud Router work to enhance security, networking, and accessibility.
+We deploy our virtual machine (VM) with Google Compute Engine, while the services Virtual Private Cloud (VPC), Identity Aware Proxy (IAP), Cloud NAT, and Cloud Router are used to enhance security, networking, and accessibility.
 
 ### Compute Engine
 
-Google Compute Engine is a Infrastructure as a Service (IaaS). It enables users to deploy and manage virtual machine (VM) instances in the cloud. Compute Engine provides a scalable and flexible environment for running a wide range of applications.
+Google Compute Engine is a Infrastructure as a Service (IaaS). It enables users to deploy and manage VM instances in the cloud. Compute Engine provides a scalable and flexible environment for running a wide range of applications.
 
-Our Compute Engine VM instance resides within a Virtual Private Cloud (VPC). Which enables us to create an isolated network environment that we access by the help of Cloud Router. 
+We deploy one VM with the following additional settings: 
 
-We have also divided the VPC into a subnet, with its own IP range and routing configuration. This will help us in the future if we decide to add another VM instance to our VPC.
+- Our VM instance resides within a Virtual Private Cloud (VPC). Which enables us to create an isolated network environment that we access by the help of Cloud Router. 
 
-The VM instance have shielded futures enabled that incorporates advanced security features to enhance the protection and integrity of workloads and the firewall is configured to only let trough users coming from IAP.
+- We´ve also divided the VPC into a subnet, with its own IP range and routing configuration. This will help us in the future if we decide to add another VM instance to our VPC.
+
+- The VM instance have shielded futures enabled that incorporates advanced security features to enhance the protection and integrity of workloads and the firewall is configured to only let trough users coming from IAP.
 
 
 ### Identity Aware Proxy
@@ -62,10 +64,10 @@ Cloud Router is a networking service that allows for dynamic routing within virt
 
 1. The user clicks the SSH button in the Google Cloud console or use the command `gcloud compute ssh <INSTANCE> --zone <ZONE> --tunnel-through-iap --project <PROJECT_ID>`
 2. The IAP connection authenticates and authorises the user if they have the IAM role `IAP-secured Tunnel User`.
-4. The firewall rules that we have configured only allows SSH connections from IAP. You can read more about it[here](https://cloud.google.com/iap/docs/using-tcp-forwarding).
+4. The firewall rules that we have configured only allows SSH connections from IAP. You can read more about it [here](https://cloud.google.com/iap/docs/using-tcp-forwarding).
 5. The Cloud NAT gateway and Cloud router handles internet egress traffic and internal access within Google Cloud.
-6. Which allows us to access Google Services like BigQuery and Cloud Storage.
-7. And outbound internet access for package downloads which Airbyte will need.
+6. Our Airbyte VM can read and write Google Services like BigQuery and Cloud Storage.
+7. And outbound internet access for package downloads and updates.
 
 ## Prerequisites
 
@@ -77,11 +79,12 @@ To be able to create a Google Cloud Platform account you will need to have a Gma
 
 Create your account by signing in to Google Cloud Platform [here](https://cloud.google.com/). All the projects you create in Google Cloud Platform needs to be linked to a billing account. After you have created your account you need to [enable billing](https://cloud.google.com/billing/docs/how-to/modify-project). 
 
-Follow this [guide](https://cloud.google.com/billing/docs/how-to/find-billing-account-id) in the documentation to locate your `Billing account ID` or see my method explained below for the easiest way to find your id. The `Billing account ID` is presented the following format: `010101-F0FFF0-10XX01`. You will need this value in the next step so make sure you save it in a secure place.
+Then you need to locate the `Billing account ID` which is presented the following format: `010101-F0FFF0-10XX01`. You will need this value in the next step so make sure you save it in a secure place.
 
 The easiest way to find your `Billing account ID` is to go to the go to the [Account management](https://console.cloud.google.com/billing/manage) page for the Cloud Billing account:
 
 ![ba-id-account-management-page](/posts/deploy-airbyte-with-terraform-on-google-cloud-platform_ba-id-account-management-page.png)
+Or see this [guide](https://cloud.google.com/billing/docs/how-to/find-billing-account-id) in the documentation to locate your `Billing account ID` in the other ways that are possible.
 
 ### Install Google Cloud CLI 
 
@@ -108,7 +111,7 @@ If you want to do things step by step you can go ahead and jump to the next sect
 
 If you want to save some time you can run the `service_account.sh` script located in the `/bin` folder of this project.
 
-First start by creating a .env file with the following variables:
+First start by creating a .env file in your root directory with the following variables:
 
 ```shell
 # The Google Cloud project id
@@ -127,9 +130,9 @@ sh ./bin/service_account.sh
 
 ### Create a Google Cloud Project and link your Billing account ID
 
-1. Create a new project
-2. Set the project
-3. Link your Billing account ID to the project
+1. Create a new project.
+2. Set the project.
+3. Link your Billing account ID to the project.
 
 ```shell
 # Create the project
@@ -157,10 +160,10 @@ gcloud iam service-accounts create <PROJECT_NAME> \
 gcloud iam service-accounts keys create service_account.json \
   --iam-account=<PROJECT_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
 
-# Grant the Editor role
+# Grant the Owner role
 gcloud projects add-iam-policy-binding <PROJECT_ID> \
   --member=serviceAccount:terraform@<PROJECT_ID>.iam.gserviceaccount.com \
-  --role=roles/editor
+  --role=roles/owner
   ```
 
 ### Install Terraform
@@ -283,7 +286,7 @@ resource "google_project_iam_member" "project" {
 resource "google_compute_network" "vpc" {
   name                    = "airbyte-network"
   auto_create_subnetworks = "false"
-
+  depends_on = [google_project_service.api_services]
 }
 
 # Create a Subnet
@@ -385,19 +388,17 @@ variable "zone" {
 }
 
 variable "machine_type" {
-  default = "e2-medium"
+  default     = "e2-medium"
   description = "Google Cloud Platform Machine Type"
-  type = string
+  type        = string
 }
 
 variable "project_id" {
-  default     = "tcb-project-371706-400508"
   description = "Google Cloud Platform Project ID"
   type        = string
 }
 
 variable "project_name" {
-  default     = "tcb-project-371706"
   description = "Google Cloud Platform Project Name"
   type        = string
 }
@@ -495,7 +496,7 @@ Terraform will perform the following actions:
       + name               = "allow-ssh"
       + network            = "airbyte-network"
       + priority           = 1000
-      + project            = "tcb-project-371706-400508"
+      + project            = "airbyte-project-371706-400508"
       + self_link          = (known after apply)
       + source_ranges      = [
           + "35.235.240.0/20",
@@ -543,7 +544,7 @@ Terraform will perform the following actions:
         EOT
       + min_cpu_platform        = (known after apply)
       + name                    = "airbyte-instance"
-      + project                 = "tcb-project-371706-400508"
+      + project                 = "airbyte-project-371706-400508"
       + self_link               = (known after apply)
       + tags_fingerprint        = (known after apply)
       + zone                    = "europe-west1-b"
@@ -575,7 +576,7 @@ Terraform will perform the following actions:
         }
 
       + service_account {
-          + email  = "tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com"
+          + email  = "airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
           + scopes = [
               + "https://www.googleapis.com/auth/cloud-platform",
             ]
@@ -608,7 +609,7 @@ Terraform will perform the following actions:
       + id                 = (known after apply)
       + name               = "airbyte-router"
       + network            = "airbyte-network"
-      + project            = "tcb-project-371706-400508"
+      + project            = "airbyte-project-371706-400508"
       + region             = "europe-west1"
       + self_link          = (known after apply)
     }
@@ -660,8 +661,8 @@ Terraform will perform the following actions:
   + resource "google_project_iam_member" "project" {
       + etag    = (known after apply)
       + id      = (known after apply)
-      + member  = "serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com"
-      + project = "tcb-project-371706-400508"
+      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+      + project = "airbyte-project-371706-400508"
       + role    = "roles/bigquery.dataEditor"
     }
 
@@ -669,8 +670,8 @@ Terraform will perform the following actions:
   + resource "google_project_iam_member" "project" {
       + etag    = (known after apply)
       + id      = (known after apply)
-      + member  = "serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com"
-      + project = "tcb-project-371706-400508"
+      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+      + project = "airbyte-project-371706-400508"
       + role    = "roles/bigquery.jobUser"
     }
 
@@ -678,8 +679,8 @@ Terraform will perform the following actions:
   + resource "google_project_iam_member" "project" {
       + etag    = (known after apply)
       + id      = (known after apply)
-      + member  = "serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com"
-      + project = "tcb-project-371706-400508"
+      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+      + project = "airbyte-project-371706-400508"
       + role    = "roles/iam.serviceAccountUser"
     }
 
@@ -687,8 +688,8 @@ Terraform will perform the following actions:
   + resource "google_project_iam_member" "project" {
       + etag    = (known after apply)
       + id      = (known after apply)
-      + member  = "serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com"
-      + project = "tcb-project-371706-400508"
+      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+      + project = "airbyte-project-371706-400508"
       + role    = "roles/iap.tunnelResourceAccessor"
     }
 
@@ -696,8 +697,8 @@ Terraform will perform the following actions:
   + resource "google_project_iam_member" "project" {
       + etag    = (known after apply)
       + id      = (known after apply)
-      + member  = "serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com"
-      + project = "tcb-project-371706-400508"
+      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+      + project = "airbyte-project-371706-400508"
       + role    = "roles/logging.admin"
     }
 
@@ -705,8 +706,8 @@ Terraform will perform the following actions:
   + resource "google_project_iam_member" "project" {
       + etag    = (known after apply)
       + id      = (known after apply)
-      + member  = "serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com"
-      + project = "tcb-project-371706-400508"
+      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+      + project = "airbyte-project-371706-400508"
       + role    = "roles/run.admin"
     }
 
@@ -715,7 +716,7 @@ Terraform will perform the following actions:
       + disable_dependent_services = true
       + disable_on_destroy         = false
       + id                         = (known after apply)
-      + project                    = "tcb-project-371706-400508"
+      + project                    = "airbyte-project-371706-400508"
       + service                    = "cloudresourcemanager.googleapis.com"
     }
 
@@ -724,7 +725,7 @@ Terraform will perform the following actions:
       + disable_dependent_services = true
       + disable_on_destroy         = false
       + id                         = (known after apply)
-      + project                    = "tcb-project-371706-400508"
+      + project                    = "airbyte-project-371706-400508"
       + service                    = "compute.googleapis.com"
     }
 
@@ -743,8 +744,8 @@ Do you want to perform these actions?
 google_project_service.api_services["compute.googleapis.com"]: Creating...
 google_project_service.api_services["cloudresourcemanager.googleapis.com"]: Creating...
 google_compute_network.vpc: Creating...
-google_project_service.api_services["compute.googleapis.com"]: Creation complete after 4s [id=tcb-project-371706-400508/compute.googleapis.com]
-google_project_service.api_services["cloudresourcemanager.googleapis.com"]: Creation complete after 4s [id=tcb-project-371706-400508/cloudresourcemanager.googleapis.com]
+google_project_service.api_services["compute.googleapis.com"]: Creation complete after 4s [id=airbyte-project-371706-400508/compute.googleapis.com]
+google_project_service.api_services["cloudresourcemanager.googleapis.com"]: Creation complete after 4s [id=airbyte-project-371706-400508/cloudresourcemanager.googleapis.com]
 google_project_iam_member.project["roles/bigquery.jobUser"]: Creating...
 google_project_iam_member.project["roles/iap.tunnelResourceAccessor"]: Creating...
 google_project_iam_member.project["roles/bigquery.dataEditor"]: Creating...
@@ -752,33 +753,33 @@ google_project_iam_member.project["roles/run.admin"]: Creating...
 google_project_iam_member.project["roles/logging.admin"]: Creating...
 google_project_iam_member.project["roles/iam.serviceAccountUser"]: Creating...
 google_compute_network.vpc: Still creating... [10s elapsed]
-google_project_iam_member.project["roles/logging.admin"]: Creation complete after 9s [id=tcb-project-371706-400508/roles/logging.admin/serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/run.admin"]: Creation complete after 9s [id=tcb-project-371706-400508/roles/run.admin/serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/iap.tunnelResourceAccessor"]: Creation complete after 10s [id=tcb-project-371706-400508/roles/iap.tunnelResourceAccessor/serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com]
+google_project_iam_member.project["roles/logging.admin"]: Creation complete after 9s [id=airbyte-project-371706-400508/roles/logging.admin/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+google_project_iam_member.project["roles/run.admin"]: Creation complete after 9s [id=airbyte-project-371706-400508/roles/run.admin/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+google_project_iam_member.project["roles/iap.tunnelResourceAccessor"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/iap.tunnelResourceAccessor/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
 google_project_iam_member.project["roles/bigquery.jobUser"]: Still creating... [10s elapsed]
 google_project_iam_member.project["roles/iam.serviceAccountUser"]: Still creating... [10s elapsed]
 google_project_iam_member.project["roles/bigquery.dataEditor"]: Still creating... [10s elapsed]
-google_project_iam_member.project["roles/bigquery.dataEditor"]: Creation complete after 10s [id=tcb-project-371706-400508/roles/bigquery.dataEditor/serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/bigquery.jobUser"]: Creation complete after 10s [id=tcb-project-371706-400508/roles/bigquery.jobUser/serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/iam.serviceAccountUser"]: Creation complete after 11s [id=tcb-project-371706-400508/roles/iam.serviceAccountUser/serviceAccount:tcb-project-371706@tcb-project-371706-400508.iam.gserviceaccount.com]
+google_project_iam_member.project["roles/bigquery.dataEditor"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/bigquery.dataEditor/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+google_project_iam_member.project["roles/bigquery.jobUser"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/bigquery.jobUser/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+google_project_iam_member.project["roles/iam.serviceAccountUser"]: Creation complete after 11s [id=airbyte-project-371706-400508/roles/iam.serviceAccountUser/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
 google_compute_network.vpc: Still creating... [20s elapsed]
-google_compute_network.vpc: Creation complete after 22s [id=projects/tcb-project-371706-400508/global/networks/airbyte-network]
+google_compute_network.vpc: Creation complete after 22s [id=projects/airbyte-project-371706-400508/global/networks/airbyte-network]
 google_compute_router.router: Creating...
 google_compute_subnetwork.subnet: Creating...
 google_compute_firewall.rules: Creating...
 google_compute_router.router: Still creating... [10s elapsed]
 google_compute_subnetwork.subnet: Still creating... [10s elapsed]
 google_compute_firewall.rules: Still creating... [10s elapsed]
-google_compute_router.router: Creation complete after 12s [id=projects/tcb-project-371706-400508/regions/europe-west1/routers/airbyte-router]
+google_compute_router.router: Creation complete after 12s [id=projects/airbyte-project-371706-400508/regions/europe-west1/routers/airbyte-router]
 google_compute_router_nat.nat: Creating...
-google_compute_firewall.rules: Creation complete after 12s [id=projects/tcb-project-371706-400508/global/firewalls/allow-ssh]
+google_compute_firewall.rules: Creation complete after 12s [id=projects/airbyte-project-371706-400508/global/firewalls/allow-ssh]
 google_compute_subnetwork.subnet: Still creating... [20s elapsed]
 google_compute_router_nat.nat: Still creating... [10s elapsed]
-google_compute_subnetwork.subnet: Creation complete after 23s [id=projects/tcb-project-371706-400508/regions/europe-west1/subnetworks/airbyte-subnet]
+google_compute_subnetwork.subnet: Creation complete after 23s [id=projects/airbyte-project-371706-400508/regions/europe-west1/subnetworks/airbyte-subnet]
 google_compute_instance.airbyte-instance: Creating...
-google_compute_router_nat.nat: Creation complete after 12s [id=tcb-project-371706-400508/europe-west1/airbyte-router/airbyte-router-nat]
+google_compute_router_nat.nat: Creation complete after 12s [id=airbyte-project-371706-400508/europe-west1/airbyte-router/airbyte-router-nat]
 google_compute_instance.airbyte-instance: Still creating... [10s elapsed]
-google_compute_instance.airbyte-instance: Creation complete after 13s [id=projects/tcb-project-371706-400508/zones/europe-west1-b/instances/airbyte-instance]
+google_compute_instance.airbyte-instance: Creation complete after 13s [id=projects/airbyte-project-371706-400508/zones/europe-west1-b/instances/airbyte-instance]
 
 Apply complete! Resources: 14 added, 0 changed, 0 destroyed.
 ```
@@ -829,9 +830,7 @@ Enter passphrase for key '/Users/hampussanden/.ssh/google_compute_engine':
 
 Go to http://localhost:8000/ and you will get a prompt asking for a user name and password. To login for the first time you use the default user name `airbyte` and password `password` which is explained in the [quickstart](https://github.com/airbytehq/airbyte/blob/master/docs/quickstart/deploy-airbyte.md) documentation.
 
-screenshot
-
-Once you have logged in you need to provide and email address and organisation name for the account. You also have the option to anonymise data collection.
+Once you have logged in you need to provide an email address and organisation name for the account. You also have the option to turn on anonymised data collection.
 
 ![Screenshot 2023-10-02 at 10.27.58](/posts/deploy-airbyte-with-terraform-on-google-cloud-platform_screenshot-2023-10-02-at-10-27-58.jpg)
 
@@ -864,18 +863,20 @@ Here is the [Google Compute Engine pricing](https://cloud.google.com/compute/all
 
 ### What are the risks of having a VM with public IP?
 
+A VM with a public IP is directly reachable from the internet. This makes it susceptible to various external threats, including unauthorized access attempts, DDoS attacks, and exploitation of vulnerabilities.
 
-### Is it possible
-
+If proper security measures aren't in place, there's a risk of unauthorized users gaining access to the VM. This could lead to unauthorized data access, data loss, or other security breaches.
 
 ## References
-
-- https://github.com/danilo-nzyte/airbyte-terraform-gcp/tree/main
+- https://cloud.google.com/iap/docs/concepts-overview
+- https://cloud.google.com/network-connectivity/docs/router/concepts/overview
+- https://cloud.google.com/nat/docs/overview
 - https://registry.terraform.io/providers/hashicorp/google/latest/docs
 - https://cloud.google.com/docs/terraform/get-started-with-terraform
 - https://dev.to/alvardev/gcp-cloud-functions-with-a-static-ip-3fe9
 - https://alphasec.io/3-tips-to-secure-your-gcp-vm-instance/
 - https://medium.com/@larry_nguyen/comparing-google-private-access-and-cloud-nat-cc43ddc9ce61
+- https://github.com/danilo-nzyte/airbyte-terraform-gcp/tree/main
 - https://www.seblu.de/2021/12/iap-bypass.html?m=1
 - https://johansiebens.dev/posts/2020/12/control-access-to-your-on-prem-services-with-cloud-iap-and-inlets-pro/
 - https://cloud.google.com/iap/docs/concepts-overview
