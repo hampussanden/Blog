@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696348113547
+updatedAt: 1696405383799
 tags:
   - Google Cloud
   - Airbyte
@@ -12,19 +12,17 @@ heroImage: /posts/deploy-airbyte-with-terraform-on-google-cloud-platform_thumbna
 public: true
 layout: ../../layouts/BlogPost.astro
 ---
-Airbyte has quickly become one of the most popular data ingestion tools on the market and it's easy to understand why once you start to get familiar with the tool. Airbyte has hundreds of connectors out of the box, and for any that don’t exist, there's the option to create your own. 
+Airbyte has quickly become one of the most popular data ingestion tools on the market and it's easy to understand why once you start to get familiar with the tool. Airbyte has hundreds of connectors out of the box, and for the connectors that don't exist, you have the option to create your own. 
 
-Although Airbyte started out as open-source I would not classify it as fully open-source today. But it is highly flexible and compared to other competitors like Fivetran and Stitch it's the tool to use for data ingestion in my opinion. 
+In this post I will cover how to deploy Airbyte to a Compute Engine instance in Google Cloud Platform. The goal is to help you get started as seamlessly as possible and we'll work through the practical example of installing Airbyte as explained in their documentation [here](https://docs.airbyte.com/deploying-airbyte/on-gcp-compute-engine/), using Terraform to provision everything in Google Cloud. 
 
-In this post I will cover how to deploy Airbyte to a Compute Engine instance in Google Cloud Platform. The aim is to help you get started as seamlessly as possible and we'll work through the practical example of installing Airbyte as explained in their documentation here, using Terraform to provision everything in Google Cloud. 
+The benefit of using Terraform to provision your deployment is that the work you put in will be easily replicable for anyone else who wants to do the same setup.
 
-The benefit of using Terraform to provision your deployment is that the work you put in will be easily replicable for anyone else who needs it.
+If you've ever tried to setup Airbyte you know that it's very easy to do and requires zero effort just to get started if you just follow the documentation from start to finish, no matter what method/ provider you choose (AWS, Azure, Google Cloud Platform, Kubernetes etc.). 
 
-The Airbyte documentation is very thorough and runs through the process of deploying Airbyte via any of the usual means (AWS, Azure, Google Cloud Platform, Kubernetes etc.). 
+But using a free tool comes with the responsibility of deploying the service to your own environment and Airbytes documentation doesn't go trough all aspects of deploying the tool. Especially the security aspect of running Airbyte on a server which is left to the user to interpret themselves.
 
-But using a free tool comes with the responsibility of deploying the service to our own environment and Airbytes documentation doesn't go trough all aspects of deploying the tool to your chosen cloud provider.
-
-If you've ever tried to setup Airbyte on Google Cloud you know that it's very easy to do and requires zero effort just to get started if you just follow the documentation from start to finish. But you have surely found yourself wondering what you should do next when you see this message at the end of the [documentation](https://docs.airbyte.com/deploying-airbyte/on-gcp-compute-engine/):
+If this is your first time setting up Airbyte maybe you will find yourself wondering what you should do next when you see this message at the end of the documentation:
 
 ![Screenshot 2023-10-03 at 11.17.22](/posts/deploy-airbyte-with-terraform-on-google-cloud-platform_screenshot-2023-10-03-at-11-17-22.jpg)
 The steps shown in the documentation is not meant to show how you get a production ready Airbyte instance up and running. It only goes trough how you get Airbyte up and running on a VM in the cloud and that is exactly why you should proceed with caution before running your Airbyte installation on a publicly exposed VM.
@@ -163,13 +161,11 @@ on darwin_arm64
 
 It is possible to access your VM via IAP Desktop if you are on Windows or Linux. Click [here](https://github.com/GoogleCloudPlatform/iap-desktop) to download IAP Desktop and follow the steps in the documentation to login via IAP Desktop. 
 
-You could also easily access your VM via SSH in your terminal which will be the option for everyone who is using MacOS and I will be showing you later in the post how you do this.
-
-**Note:** It is possible to access your VM via SSH in your terminal no matter what OS you are on but it can be much simpler to use IAP Desktop for someone who is working in a multi-tiered application with multiple VMs and Subnets.
+You could also access your VM via SSH in your terminal which will be the option for everyone who is using MacOS and I will be showing you later in the post how you do this.
 
 ### Create a `terraform.tfvars` file
 
-Create a `terraform.tfvars` file with the following variables:
+Create a `terraform.tfvars` file in your root directory with the following variables:
 
 ```shell
 # The Billing account ID from the first step
@@ -187,9 +183,45 @@ zone = ""
 
 ## Getting started
 
-### Terraform overview
+### Project overview
 
 As a part of this project, the following resource will be deployed with the Terraform.
+
+```
+tree
+
+.
+├── bin
+│   ├── airbyte.sh
+│   └── service_account.sh
+├── main.tf
+├── provider.tf
+├── service_account.json
+└── variables.tf
+```
+
+/bin/airbyte.sh
+
+```shell
+#! /bin/bash
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common wget
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add --
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+sudo usermod -a -G docker $USER
+
+sudo apt-get -y install docker-compose-plugin
+docker compose version
+
+mkdir airbyte && cd airbyte
+wget https://raw.githubusercontent.com/airbytehq/airbyte/master/run-ab-platform.sh
+chmod +x run-ab-platform.sh
+./run-ab-platform.sh -b
+
+EOF
+```
 
 main.tf
 
@@ -386,6 +418,26 @@ gcloud config set project <PROJECT_ID>
 Initialize the backend, validate, and format your configuration.
 
 ```shell
+terraform init
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Reusing previous version of hashicorp/google from the dependency lock file
+- Using previously-installed hashicorp/google v4.49.0
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+```
+
+```shell
 terraform validate
 Success! The configuration is valid.
 ```
@@ -396,7 +448,7 @@ main.tf
 provider.tf
 ```
 
-Create your resources.
+Now go on and create your resources.
 
 ```shell
 terraform apply
@@ -750,7 +802,9 @@ Enter passphrase for key '/Users/hampussanden/.ssh/google_compute_engine':
 
 Go to http://localhost:8000/ and you will get a prompt asking for a user name and password. To login for the first time you use the default user name `airbyte` and password `password` which is explained in the [quickstart](https://github.com/airbytehq/airbyte/blob/master/docs/quickstart/deploy-airbyte.md) documentation.
 
-Once you have logged in you need to provide and email address and organisation name for the account. You also have the option anonymise data collection.
+screenshot
+
+Once you have logged in you need to provide and email address and organisation name for the account. You also have the option to anonymise data collection.
 
 ![Screenshot 2023-10-02 at 10.27.58](/posts/deploy-airbyte-with-terraform-on-google-cloud-platform_screenshot-2023-10-02-at-10-27-58.jpg)
 
