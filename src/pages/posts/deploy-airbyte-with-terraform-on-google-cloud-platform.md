@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696430516714
+updatedAt: 1696493269996
 tags:
   - Google Cloud
   - Airbyte
@@ -12,20 +12,18 @@ heroImage: /posts/deploy-airbyte-with-terraform-on-google-cloud-platform_thumbna
 public: true
 layout: ../../layouts/BlogPost.astro
 ---
-Airbyte has quickly become one of the most popular data ingestion tools on the market and it's easy to understand why once you start to get familiar with the tool. Airbyte has hundreds of connectors out of the box, and for the connectors that don't exist, you have the option to create your own. 
-
 In this post I will cover how to deploy Airbyte to a Compute Engine instance on Google Cloud Platform (GCP). The goal is to help you get started as seamlessly as possible with a production ready (VM) virtual machine instance and we'll work through the example of installing Airbyte that is explained in their documentation [here](https://docs.airbyte.com/deploying-airbyte/on-gcp-compute-engine/), using Terraform to provision everything in Google Cloud. 
 
 The benefit of using Terraform to provision your deployment is that the work you put in will be easily replicable for anyone else who wants to do the same setup.
 
 If you've ever tried to setup Airbyte you know that it's very easy to do and requires zero effort just to get started if you just follow the documentation from start to finish, no matter what method/provider you choose (AWS, Azure, GCP, Kubernetes etc.). 
 
-But using a free tool comes with the responsibility of deploying the service to your own environment and Airbytes documentation doesn't go trough all aspects of deploying the tool. And in this case, especially the security aspect of running Airbyte on a server in the cloud which the user is left to interpret themselves.
+But using a free tool comes with the responsibility of deploying the service to your own environment and Airbytes documentation doesn't go trough all aspects of deploying the tool, especially the security aspect of running Airbyte on a server in the cloud. And for this you've got to look at your cloud providers documentation to get the answer.
 
 If this is your first time setting up Airbyte maybe you will find yourself wondering what you should do next when you see this message at the end of the documentation:
 
 ![Screenshot 2023-10-03 at 11.17.22](/posts/deploy-airbyte-with-terraform-on-google-cloud-platform_screenshot-2023-10-03-at-11-17-22.jpg)
-The steps shown in the documentation is not meant to show how you get a production ready Airbyte instance up and running. It only goes trough how you get Airbyte up and running on a VM in the cloud and that is exactly why you should proceed with caution before running your Airbyte installation on a publicly exposed VM.
+If you want to get a production ready VM up and running in Google Cloud you have some more settings to go through and that is exactly why you should proceed with caution before running your Airbyte installation on a publicly exposed VM.
 
 ## Architecture
 
