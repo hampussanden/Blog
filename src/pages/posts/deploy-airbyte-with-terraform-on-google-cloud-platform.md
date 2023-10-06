@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696493269996
+updatedAt: 1696585253601
 tags:
   - Google Cloud
   - Airbyte
@@ -172,14 +172,15 @@ Follow the instructions [here](https://learn.hashicorp.com/tutorials/terraform/i
 terraform -v
 ```
 
-You should see the following output:
-
-```shell
-Terraform v1.5.7
-on darwin_arm64
-+ provider registry.terraform.io/hashicorp/google v4.84.0
-```
-
+<details>
+  <summary><b>Command output</b><br />&nbsp;</summary>
+  
+  ```shell
+  Terraform v1.5.7
+  on darwin_arm64
+  + provider registry.terraform.io/hashicorp/google v4.84.0
+  ```
+</details>
 
 ### Optional: Download and install the IAP Desktop on your local machine. 
 
@@ -441,294 +442,320 @@ First start with initializing the backend.
 
 ```shell
 terraform init
-
-Initializing the backend...
-
-Initializing provider plugins...
-- Reusing previous version of hashicorp/google from the dependency lock file
-- Using previously-installed hashicorp/google v4.49.0
-
-Terraform has been successfully initialized!
-
-You may now begin working with Terraform. Try running "terraform plan" to see
-any changes that are required for your infrastructure. All Terraform commands
-should now work.
-
-If you ever set or change modules or backend configuration for Terraform,
-rerun this command to reinitialize your working directory. If you forget, other
-commands will detect it and remind you to do so if necessary.
 ```
+
+<details>
+  <summary><b>Command output</b><br />&nbsp;</summary>
+  
+  ```shell
+  Initializing the backend...
+
+  Initializing provider plugins...
+  - Reusing previous version of hashicorp/google from the dependency lock file
+  - Using previously-installed hashicorp/google v4.49.0
+
+  Terraform has been successfully initialized!
+
+  You may now begin working with Terraform. Try running "terraform plan" to see
+  any changes that are required for your infrastructure. All Terraform commands
+  should now work.
+
+  If you ever set or change modules or backend configuration for Terraform,
+  rerun this command to reinitialize your working directory. If you forget, other
+  commands will detect it and remind you to do so if necessary.
+  ```
+</details>
 
 Then validate your configuration.
 
 ```shell
 terraform validate
-Success! The configuration is valid.
 ```
+
+<details>
+  <summary><b>Command output</b><br />&nbsp;</summary>
+  
+  ```shell
+  Success! The configuration is valid.
+  ```
+</details>
 
 And format your configuration.
 
 ```shell
 terraform fmt
-main.tf
-provider.tf
 ```
+
+<details>
+  <summary><b>Command output</b><br />&nbsp;</summary>
+  
+  ```shell
+  main.tf
+  provider.tf
+  ```
+</details>
 
 If everything looks good you can go on and create your resources.
 
 ```shell
 terraform apply
+```
 
-Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+<details>
+  <summary><b>Command output</b><br />&nbsp;</summary>
+  
+  ```shell
+  Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
   + create
 
-Terraform will perform the following actions:
+  Terraform will perform the following actions:
 
-  # google_compute_firewall.rules will be created
-  + resource "google_compute_firewall" "rules" {
-      + creation_timestamp = (known after apply)
-      + destination_ranges = (known after apply)
-      + direction          = (known after apply)
-      + enable_logging     = (known after apply)
-      + id                 = (known after apply)
-      + name               = "allow-ssh"
-      + network            = "airbyte-network"
-      + priority           = 1000
-      + project            = "airbyte-project-371706-400508"
-      + self_link          = (known after apply)
-      + source_ranges      = [
-          + "35.235.240.0/20",
-        ]
+    # google_compute_firewall.rules will be created
+    + resource "google_compute_firewall" "rules" {
+        + creation_timestamp = (known after apply)
+        + destination_ranges = (known after apply)
+        + direction          = (known after apply)
+        + enable_logging     = (known after apply)
+        + id                 = (known after apply)
+        + name               = "allow-ssh"
+        + network            = "airbyte-network"
+        + priority           = 1000
+        + project            = "airbyte-project-371706-400508"
+        + self_link          = (known after apply)
+        + source_ranges      = [
+            + "35.235.240.0/20",
+          ]
 
-      + allow {
-          + ports    = [
-              + "22",
-            ]
-          + protocol = "tcp"
-        }
-    }
+        + allow {
+            + ports    = [
+                + "22",
+              ]
+            + protocol = "tcp"
+          }
+      }
 
-  # google_compute_instance.airbyte-instance will be created
-  + resource "google_compute_instance" "airbyte-instance" {
-      + can_ip_forward          = false
-      + cpu_platform            = (known after apply)
-      + current_status          = (known after apply)
-      + deletion_protection     = false
-      + guest_accelerator       = (known after apply)
-      + id                      = (known after apply)
-      + instance_id             = (known after apply)
-      + label_fingerprint       = (known after apply)
-      + machine_type            = "e2-medium"
-      + metadata_fingerprint    = (known after apply)
-      + metadata_startup_script = <<-EOT
-            #! /bin/bash
-            sudo apt-get update
-            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common wget
-            curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add --
-            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
-            sudo apt-get update
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-            sudo usermod -a -G docker $USER
-            
-            sudo apt-get -y install docker-compose-plugin
-            docker compose version
-            
-            mkdir airbyte && cd airbyte
-            wget https://raw.githubusercontent.com/airbytehq/airbyte/master/run-ab-platform.sh
-            chmod +x run-ab-platform.sh
-            ./run-ab-platform.sh -b
-            
-            EOF
-        EOT
-      + min_cpu_platform        = (known after apply)
-      + name                    = "airbyte-instance"
-      + project                 = "airbyte-project-371706-400508"
-      + self_link               = (known after apply)
-      + tags_fingerprint        = (known after apply)
-      + zone                    = "europe-west1-b"
+    # google_compute_instance.airbyte-instance will be created
+    + resource "google_compute_instance" "airbyte-instance" {
+        + can_ip_forward          = false
+        + cpu_platform            = (known after apply)
+        + current_status          = (known after apply)
+        + deletion_protection     = false
+        + guest_accelerator       = (known after apply)
+        + id                      = (known after apply)
+        + instance_id             = (known after apply)
+        + label_fingerprint       = (known after apply)
+        + machine_type            = "e2-medium"
+        + metadata_fingerprint    = (known after apply)
+        + metadata_startup_script = <<-EOT
+              #! /bin/bash
+              sudo apt-get update
+              sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common wget
+              curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add --
+              sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
+              sudo apt-get update
+              sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+              sudo usermod -a -G docker $USER
 
-      + boot_disk {
-          + auto_delete                = true
-          + device_name                = (known after apply)
-          + disk_encryption_key_sha256 = (known after apply)
-          + kms_key_self_link          = (known after apply)
-          + mode                       = "READ_WRITE"
-          + source                     = (known after apply)
+              sudo apt-get -y install docker-compose-plugin
+              docker compose version
 
-          + initialize_params {
-              + image  = "debian-10-buster-v20230912"
-              + labels = (known after apply)
-              + size   = (known after apply)
-              + type   = (known after apply)
-            }
-        }
+              mkdir airbyte && cd airbyte
+              wget https://raw.githubusercontent.com/airbytehq/airbyte/master/run-ab-platform.sh
+              chmod +x run-ab-platform.sh
+              ./run-ab-platform.sh -b
 
-      + network_interface {
-          + ipv6_access_type   = (known after apply)
-          + name               = (known after apply)
-          + network            = "airbyte-network"
-          + network_ip         = (known after apply)
-          + stack_type         = (known after apply)
-          + subnetwork         = "airbyte-subnet"
-          + subnetwork_project = (known after apply)
-        }
+              EOF
+          EOT
+        + min_cpu_platform        = (known after apply)
+        + name                    = "airbyte-instance"
+        + project                 = "airbyte-project-371706-400508"
+        + self_link               = (known after apply)
+        + tags_fingerprint        = (known after apply)
+        + zone                    = "europe-west1-b"
 
-      + service_account {
-          + email  = "airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
-          + scopes = [
-              + "https://www.googleapis.com/auth/cloud-platform",
-            ]
-        }
+        + boot_disk {
+            + auto_delete                = true
+            + device_name                = (known after apply)
+            + disk_encryption_key_sha256 = (known after apply)
+            + kms_key_self_link          = (known after apply)
+            + mode                       = "READ_WRITE"
+            + source                     = (known after apply)
 
-      + shielded_instance_config {
-          + enable_integrity_monitoring = true
-          + enable_secure_boot          = true
-          + enable_vtpm                 = true
-        }
-    }
+            + initialize_params {
+                + image  = "debian-10-buster-v20230912"
+                + labels = (known after apply)
+                + size   = (known after apply)
+                + type   = (known after apply)
+              }
+          }
 
-  # google_compute_network.vpc will be created
-  + resource "google_compute_network" "vpc" {
-      + auto_create_subnetworks         = false
-      + delete_default_routes_on_create = false
-      + gateway_ipv4                    = (known after apply)
-      + id                              = (known after apply)
-      + internal_ipv6_range             = (known after apply)
-      + mtu                             = (known after apply)
-      + name                            = "airbyte-network"
-      + project                         = (known after apply)
-      + routing_mode                    = (known after apply)
-      + self_link                       = (known after apply)
-    }
+        + network_interface {
+            + ipv6_access_type   = (known after apply)
+            + name               = (known after apply)
+            + network            = "airbyte-network"
+            + network_ip         = (known after apply)
+            + stack_type         = (known after apply)
+            + subnetwork         = "airbyte-subnet"
+            + subnetwork_project = (known after apply)
+          }
 
-  # google_compute_router.router will be created
-  + resource "google_compute_router" "router" {
-      + creation_timestamp = (known after apply)
-      + id                 = (known after apply)
-      + name               = "airbyte-router"
-      + network            = "airbyte-network"
-      + project            = "airbyte-project-371706-400508"
-      + region             = "europe-west1"
-      + self_link          = (known after apply)
-    }
+        + service_account {
+            + email  = "airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+            + scopes = [
+                + "https://www.googleapis.com/auth/cloud-platform",
+              ]
+          }
 
-  # google_compute_router_nat.nat will be created
-  + resource "google_compute_router_nat" "nat" {
-      + enable_dynamic_port_allocation      = (known after apply)
-      + enable_endpoint_independent_mapping = true
-      + icmp_idle_timeout_sec               = 30
-      + id                                  = (known after apply)
-      + name                                = "airbyte-router-nat"
-      + nat_ip_allocate_option              = "AUTO_ONLY"
-      + project                             = (known after apply)
-      + region                              = "europe-west1"
-      + router                              = "airbyte-router"
-      + source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-      + tcp_established_idle_timeout_sec    = 1200
-      + tcp_transitory_idle_timeout_sec     = 30
-      + udp_idle_timeout_sec                = 30
+        + shielded_instance_config {
+            + enable_integrity_monitoring = true
+            + enable_secure_boot          = true
+            + enable_vtpm                 = true
+          }
+      }
 
-      + log_config {
-          + enable = true
-          + filter = "ERRORS_ONLY"
-        }
-    }
+    # google_compute_network.vpc will be created
+    + resource "google_compute_network" "vpc" {
+        + auto_create_subnetworks         = false
+        + delete_default_routes_on_create = false
+        + gateway_ipv4                    = (known after apply)
+        + id                              = (known after apply)
+        + internal_ipv6_range             = (known after apply)
+        + mtu                             = (known after apply)
+        + name                            = "airbyte-network"
+        + project                         = (known after apply)
+        + routing_mode                    = (known after apply)
+        + self_link                       = (known after apply)
+      }
 
-  # google_compute_subnetwork.subnet will be created
-  + resource "google_compute_subnetwork" "subnet" {
-      + creation_timestamp         = (known after apply)
-      + external_ipv6_prefix       = (known after apply)
-      + fingerprint                = (known after apply)
-      + gateway_address            = (known after apply)
-      + id                         = (known after apply)
-      + ip_cidr_range              = "10.10.0.0/24"
-      + ipv6_cidr_range            = (known after apply)
-      + name                       = "airbyte-subnet"
-      + network                    = "airbyte-network"
-      + private_ip_google_access   = true
-      + private_ipv6_google_access = (known after apply)
-      + project                    = (known after apply)
-      + purpose                    = (known after apply)
-      + region                     = "europe-west1"
-      + secondary_ip_range         = (known after apply)
-      + self_link                  = (known after apply)
-      + stack_type                 = (known after apply)
-    }
+    # google_compute_router.router will be created
+    + resource "google_compute_router" "router" {
+        + creation_timestamp = (known after apply)
+        + id                 = (known after apply)
+        + name               = "airbyte-router"
+        + network            = "airbyte-network"
+        + project            = "airbyte-project-371706-400508"
+        + region             = "europe-west1"
+        + self_link          = (known after apply)
+      }
 
-  # google_project_iam_member.project["roles/bigquery.dataEditor"] will be created
-  + resource "google_project_iam_member" "project" {
-      + etag    = (known after apply)
-      + id      = (known after apply)
-      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
-      + project = "airbyte-project-371706-400508"
-      + role    = "roles/bigquery.dataEditor"
-    }
+    # google_compute_router_nat.nat will be created
+    + resource "google_compute_router_nat" "nat" {
+        + enable_dynamic_port_allocation      = (known after apply)
+        + enable_endpoint_independent_mapping = true
+        + icmp_idle_timeout_sec               = 30
+        + id                                  = (known after apply)
+        + name                                = "airbyte-router-nat"
+        + nat_ip_allocate_option              = "AUTO_ONLY"
+        + project                             = (known after apply)
+        + region                              = "europe-west1"
+        + router                              = "airbyte-router"
+        + source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+        + tcp_established_idle_timeout_sec    = 1200
+        + tcp_transitory_idle_timeout_sec     = 30
+        + udp_idle_timeout_sec                = 30
 
-  # google_project_iam_member.project["roles/bigquery.jobUser"] will be created
-  + resource "google_project_iam_member" "project" {
-      + etag    = (known after apply)
-      + id      = (known after apply)
-      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
-      + project = "airbyte-project-371706-400508"
-      + role    = "roles/bigquery.jobUser"
-    }
+        + log_config {
+            + enable = true
+            + filter = "ERRORS_ONLY"
+          }
+      }
 
-  # google_project_iam_member.project["roles/iam.serviceAccountUser"] will be created
-  + resource "google_project_iam_member" "project" {
-      + etag    = (known after apply)
-      + id      = (known after apply)
-      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
-      + project = "airbyte-project-371706-400508"
-      + role    = "roles/iam.serviceAccountUser"
-    }
+    # google_compute_subnetwork.subnet will be created
+    + resource "google_compute_subnetwork" "subnet" {
+        + creation_timestamp         = (known after apply)
+        + external_ipv6_prefix       = (known after apply)
+        + fingerprint                = (known after apply)
+        + gateway_address            = (known after apply)
+        + id                         = (known after apply)
+        + ip_cidr_range              = "10.10.0.0/24"
+        + ipv6_cidr_range            = (known after apply)
+        + name                       = "airbyte-subnet"
+        + network                    = "airbyte-network"
+        + private_ip_google_access   = true
+        + private_ipv6_google_access = (known after apply)
+        + project                    = (known after apply)
+        + purpose                    = (known after apply)
+        + region                     = "europe-west1"
+        + secondary_ip_range         = (known after apply)
+        + self_link                  = (known after apply)
+        + stack_type                 = (known after apply)
+      }
 
-  # google_project_iam_member.project["roles/iap.tunnelResourceAccessor"] will be created
-  + resource "google_project_iam_member" "project" {
-      + etag    = (known after apply)
-      + id      = (known after apply)
-      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
-      + project = "airbyte-project-371706-400508"
-      + role    = "roles/iap.tunnelResourceAccessor"
-    }
+    # google_project_iam_member.project["roles/bigquery.dataEditor"] will be created
+    + resource "google_project_iam_member" "project" {
+        + etag    = (known after apply)
+        + id      = (known after apply)
+        + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+        + project = "airbyte-project-371706-400508"
+        + role    = "roles/bigquery.dataEditor"
+      }
 
-  # google_project_iam_member.project["roles/logging.admin"] will be created
-  + resource "google_project_iam_member" "project" {
-      + etag    = (known after apply)
-      + id      = (known after apply)
-      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
-      + project = "airbyte-project-371706-400508"
-      + role    = "roles/logging.admin"
-    }
+    # google_project_iam_member.project["roles/bigquery.jobUser"] will be created
+    + resource "google_project_iam_member" "project" {
+        + etag    = (known after apply)
+        + id      = (known after apply)
+        + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+        + project = "airbyte-project-371706-400508"
+        + role    = "roles/bigquery.jobUser"
+      }
 
-  # google_project_iam_member.project["roles/run.admin"] will be created
-  + resource "google_project_iam_member" "project" {
-      + etag    = (known after apply)
-      + id      = (known after apply)
-      + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
-      + project = "airbyte-project-371706-400508"
-      + role    = "roles/run.admin"
-    }
+    # google_project_iam_member.project["roles/iam.serviceAccountUser"] will be created
+    + resource "google_project_iam_member" "project" {
+        + etag    = (known after apply)
+        + id      = (known after apply)
+        + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+        + project = "airbyte-project-371706-400508"
+        + role    = "roles/iam.serviceAccountUser"
+      }
 
-  # google_project_service.api_services["cloudresourcemanager.googleapis.com"] will be created
-  + resource "google_project_service" "api_services" {
-      + disable_dependent_services = true
-      + disable_on_destroy         = false
-      + id                         = (known after apply)
-      + project                    = "airbyte-project-371706-400508"
-      + service                    = "cloudresourcemanager.googleapis.com"
-    }
+    # google_project_iam_member.project["roles/iap.tunnelResourceAccessor"] will be created
+    + resource "google_project_iam_member" "project" {
+        + etag    = (known after apply)
+        + id      = (known after apply)
+        + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+        + project = "airbyte-project-371706-400508"
+        + role    = "roles/iap.tunnelResourceAccessor"
+      }
 
-  # google_project_service.api_services["compute.googleapis.com"] will be created
-  + resource "google_project_service" "api_services" {
-      + disable_dependent_services = true
-      + disable_on_destroy         = false
-      + id                         = (known after apply)
-      + project                    = "airbyte-project-371706-400508"
-      + service                    = "compute.googleapis.com"
-    }
+    # google_project_iam_member.project["roles/logging.admin"] will be created
+    + resource "google_project_iam_member" "project" {
+        + etag    = (known after apply)
+        + id      = (known after apply)
+        + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+        + project = "airbyte-project-371706-400508"
+        + role    = "roles/logging.admin"
+      }
 
-Plan: 14 to add, 0 to change, 0 to destroy.
-```
+    # google_project_iam_member.project["roles/run.admin"] will be created
+    + resource "google_project_iam_member" "project" {
+        + etag    = (known after apply)
+        + id      = (known after apply)
+        + member  = "serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com"
+        + project = "airbyte-project-371706-400508"
+        + role    = "roles/run.admin"
+      }
+
+    # google_project_service.api_services["cloudresourcemanager.googleapis.com"] will be created
+    + resource "google_project_service" "api_services" {
+        + disable_dependent_services = true
+        + disable_on_destroy         = false
+        + id                         = (known after apply)
+        + project                    = "airbyte-project-371706-400508"
+        + service                    = "cloudresourcemanager.googleapis.com"
+      }
+
+    # google_project_service.api_services["compute.googleapis.com"] will be created
+    + resource "google_project_service" "api_services" {
+        + disable_dependent_services = true
+        + disable_on_destroy         = false
+        + id                         = (known after apply)
+        + project                    = "airbyte-project-371706-400508"
+        + service                    = "compute.googleapis.com"
+      }
+
+  Plan: 14 to add, 0 to change, 0 to destroy.
+  ```
+</details>
 
 Type yes at the confirmation prompt to proceed.
 
@@ -738,49 +765,55 @@ Do you want to perform these actions?
   Only 'yes' will be accepted to approve.
 
   Enter a value: yes
-
-google_project_service.api_services["compute.googleapis.com"]: Creating...
-google_project_service.api_services["cloudresourcemanager.googleapis.com"]: Creating...
-google_compute_network.vpc: Creating...
-google_project_service.api_services["compute.googleapis.com"]: Creation complete after 4s [id=airbyte-project-371706-400508/compute.googleapis.com]
-google_project_service.api_services["cloudresourcemanager.googleapis.com"]: Creation complete after 4s [id=airbyte-project-371706-400508/cloudresourcemanager.googleapis.com]
-google_project_iam_member.project["roles/bigquery.jobUser"]: Creating...
-google_project_iam_member.project["roles/iap.tunnelResourceAccessor"]: Creating...
-google_project_iam_member.project["roles/bigquery.dataEditor"]: Creating...
-google_project_iam_member.project["roles/run.admin"]: Creating...
-google_project_iam_member.project["roles/logging.admin"]: Creating...
-google_project_iam_member.project["roles/iam.serviceAccountUser"]: Creating...
-google_compute_network.vpc: Still creating... [10s elapsed]
-google_project_iam_member.project["roles/logging.admin"]: Creation complete after 9s [id=airbyte-project-371706-400508/roles/logging.admin/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/run.admin"]: Creation complete after 9s [id=airbyte-project-371706-400508/roles/run.admin/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/iap.tunnelResourceAccessor"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/iap.tunnelResourceAccessor/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/bigquery.jobUser"]: Still creating... [10s elapsed]
-google_project_iam_member.project["roles/iam.serviceAccountUser"]: Still creating... [10s elapsed]
-google_project_iam_member.project["roles/bigquery.dataEditor"]: Still creating... [10s elapsed]
-google_project_iam_member.project["roles/bigquery.dataEditor"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/bigquery.dataEditor/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/bigquery.jobUser"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/bigquery.jobUser/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
-google_project_iam_member.project["roles/iam.serviceAccountUser"]: Creation complete after 11s [id=airbyte-project-371706-400508/roles/iam.serviceAccountUser/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
-google_compute_network.vpc: Still creating... [20s elapsed]
-google_compute_network.vpc: Creation complete after 22s [id=projects/airbyte-project-371706-400508/global/networks/airbyte-network]
-google_compute_router.router: Creating...
-google_compute_subnetwork.subnet: Creating...
-google_compute_firewall.rules: Creating...
-google_compute_router.router: Still creating... [10s elapsed]
-google_compute_subnetwork.subnet: Still creating... [10s elapsed]
-google_compute_firewall.rules: Still creating... [10s elapsed]
-google_compute_router.router: Creation complete after 12s [id=projects/airbyte-project-371706-400508/regions/europe-west1/routers/airbyte-router]
-google_compute_router_nat.nat: Creating...
-google_compute_firewall.rules: Creation complete after 12s [id=projects/airbyte-project-371706-400508/global/firewalls/allow-ssh]
-google_compute_subnetwork.subnet: Still creating... [20s elapsed]
-google_compute_router_nat.nat: Still creating... [10s elapsed]
-google_compute_subnetwork.subnet: Creation complete after 23s [id=projects/airbyte-project-371706-400508/regions/europe-west1/subnetworks/airbyte-subnet]
-google_compute_instance.airbyte-instance: Creating...
-google_compute_router_nat.nat: Creation complete after 12s [id=airbyte-project-371706-400508/europe-west1/airbyte-router/airbyte-router-nat]
-google_compute_instance.airbyte-instance: Still creating... [10s elapsed]
-google_compute_instance.airbyte-instance: Creation complete after 13s [id=projects/airbyte-project-371706-400508/zones/europe-west1-b/instances/airbyte-instance]
-
-Apply complete! Resources: 14 added, 0 changed, 0 destroyed.
 ```
+
+<details>
+  <summary><b>Command output</b><br />&nbsp;</summary>
+  
+  ```shell
+  google_project_service.api_services["compute.googleapis.com"]: Creating...
+  google_project_service.api_services["cloudresourcemanager.googleapis.com"]: Creating...
+  google_compute_network.vpc: Creating...
+  google_project_service.api_services["compute.googleapis.com"]: Creation complete after 4s [id=airbyte-project-371706-400508/compute.googleapis.com]
+  google_project_service.api_services["cloudresourcemanager.googleapis.com"]: Creation complete after 4s [id=airbyte-project-371706-400508/cloudresourcemanager.googleapis.com]
+  google_project_iam_member.project["roles/bigquery.jobUser"]: Creating...
+  google_project_iam_member.project["roles/iap.tunnelResourceAccessor"]: Creating...
+  google_project_iam_member.project["roles/bigquery.dataEditor"]: Creating...
+  google_project_iam_member.project["roles/run.admin"]: Creating...
+  google_project_iam_member.project["roles/logging.admin"]: Creating...
+  google_project_iam_member.project["roles/iam.serviceAccountUser"]: Creating...
+  google_compute_network.vpc: Still creating... [10s elapsed]
+  google_project_iam_member.project["roles/logging.admin"]: Creation complete after 9s [id=airbyte-project-371706-400508/roles/logging.admin/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+  google_project_iam_member.project["roles/run.admin"]: Creation complete after 9s [id=airbyte-project-371706-400508/roles/run.admin/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+  google_project_iam_member.project["roles/iap.tunnelResourceAccessor"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/iap.tunnelResourceAccessor/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+  google_project_iam_member.project["roles/bigquery.jobUser"]: Still creating... [10s elapsed]
+  google_project_iam_member.project["roles/iam.serviceAccountUser"]: Still creating... [10s elapsed]
+  google_project_iam_member.project["roles/bigquery.dataEditor"]: Still creating... [10s elapsed]
+  google_project_iam_member.project["roles/bigquery.dataEditor"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/bigquery.dataEditor/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+  google_project_iam_member.project["roles/bigquery.jobUser"]: Creation complete after 10s [id=airbyte-project-371706-400508/roles/bigquery.jobUser/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+  google_project_iam_member.project["roles/iam.serviceAccountUser"]: Creation complete after 11s [id=airbyte-project-371706-400508/roles/iam.serviceAccountUser/serviceAccount:airbyte-project-371706@airbyte-project-371706-400508.iam.gserviceaccount.com]
+  google_compute_network.vpc: Still creating... [20s elapsed]
+  google_compute_network.vpc: Creation complete after 22s [id=projects/airbyte-project-371706-400508/global/networks/airbyte-network]
+  google_compute_router.router: Creating...
+  google_compute_subnetwork.subnet: Creating...
+  google_compute_firewall.rules: Creating...
+  google_compute_router.router: Still creating... [10s elapsed]
+  google_compute_subnetwork.subnet: Still creating... [10s elapsed]
+  google_compute_firewall.rules: Still creating... [10s elapsed]
+  google_compute_router.router: Creation complete after 12s [id=projects/airbyte-project-371706-400508/regions/europe-west1/routers/airbyte-router]
+  google_compute_router_nat.nat: Creating...
+  google_compute_firewall.rules: Creation complete after 12s [id=projects/airbyte-project-371706-400508/global/firewalls/allow-ssh]
+  google_compute_subnetwork.subnet: Still creating... [20s elapsed]
+  google_compute_router_nat.nat: Still creating... [10s elapsed]
+  google_compute_subnetwork.subnet: Creation complete after 23s [id=projects/airbyte-project-371706-400508/regions/europe-west1/subnetworks/airbyte-subnet]
+  google_compute_instance.airbyte-instance: Creating...
+  google_compute_router_nat.nat: Creation complete after 12s [id=airbyte-project-371706-400508/europe-west1/airbyte-router/airbyte-router-nat]
+  google_compute_instance.airbyte-instance: Still creating... [10s elapsed]
+  google_compute_instance.airbyte-instance: Creation complete after 13s [id=projects/airbyte-project-371706-400508/zones/europe-west1-b/instances/airbyte-instance]
+
+  Apply complete! Resources: 14 added, 0 changed, 0 destroyed.
+  ```
+</details>
 
 ## Connect to your newly created instance
 
@@ -865,20 +898,22 @@ A VM with a public IP is directly reachable from the internet. This makes it sus
 
 If proper security measures aren't in place, there's a risk of unauthorized users gaining access to the VM. This could lead to unauthorized data access, data loss, or other security breaches.
 
-## References
-- https://cloud.google.com/iap/docs/concepts-overview
-- https://cloud.google.com/network-connectivity/docs/router/concepts/overview
-- https://cloud.google.com/nat/docs/overview
-- https://registry.terraform.io/providers/hashicorp/google/latest/docs
-- https://cloud.google.com/docs/terraform/get-started-with-terraform
-- https://dev.to/alvardev/gcp-cloud-functions-with-a-static-ip-3fe9
-- https://alphasec.io/3-tips-to-secure-your-gcp-vm-instance/
-- https://medium.com/@larry_nguyen/comparing-google-private-access-and-cloud-nat-cc43ddc9ce61
-- https://github.com/danilo-nzyte/airbyte-terraform-gcp/tree/main
-- https://www.seblu.de/2021/12/iap-bypass.html?m=1
-- https://johansiebens.dev/posts/2020/12/control-access-to-your-on-prem-services-with-cloud-iap-and-inlets-pro/
-- https://cloud.google.com/iap/docs/concepts-overview
-- https://medium.com/@larry_nguyen/use-identity-aware-proxy-iap-instead-of-bastion-host-to-connect-to-private-virtual-machines-in-9885bc7c12dd
+<details>
+  <summary><b>References</b></summary>
+  - https://cloud.google.com/iap/docs/concepts-overview
+  - https://cloud.google.com/network-connectivity/docs/router/concepts/overview
+  - https://cloud.google.com/nat/docs/overview
+  - https://registry.terraform.io/providers/hashicorp/google/latest/docs
+  - https://cloud.google.com/docs/terraform/get-started-with-terraform
+  - https://dev.to/alvardev/gcp-cloud-functions-with-a-static-ip-3fe9
+  - https://alphasec.io/3-tips-to-secure-your-gcp-vm-instance/
+  - https://medium.com/@larry_nguyen/comparing-google-private-access-and-cloud-nat-cc43ddc9ce61
+  - https://github.com/danilo-nzyte/airbyte-terraform-gcp/tree/main
+  - https://seblu.de/2021/12/iap-bypass.html?m=1
+  - https://johansiebens.dev/posts/2020/12/control-access-to-your-on-prem-services-with-cloud-iap-and-inlets-pro/
+  - https://cloud.google.com/iap/docs/concepts-overview
+  - https://medium.com/@larry_nguyen/use-identity-aware-proxy-iap-instead-of-bastion-host-to-connect-to-private-virtual-machines-in-9885bc7c12dd
+</details>
 
 
 
