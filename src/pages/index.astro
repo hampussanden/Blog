@@ -29,14 +29,24 @@ const posts = (await Astro.glob('./posts/*.md')).sort(
     <main class="pt-[64px]">
       <Content>
         <article class="my-20">
-        <h1 class="text-4xl font-bold font-mplus my-2">Hampus Sandén</h1>
-        <p>I'm a freelance consultant based in Stockholm, Sweden.</p>
-        <div class="mt-3 flex gap-1">
-          <a href="https://www.buymeacoffee.com/hampussanden" target="_blank"><FiCoffee size={28} className="mr-3"></FiCoffee></a>
-          <a href="https://github.com/hampussanden" target="_blank"><FiGithub size={28} className="mr-3"></FiGithub></a>
-          <a href="https://www.linkedin.com/in/hampussanden/" target="_blank"><FiLinkedin size={28} className="mr-3"></FiLinkedin></a>
-          <a href="https://twitter.com/hampussanden" target="_blank"><FiTwitter size={28} className="mr-3"></FiTwitter></a>
-        </div>
+
+
+            <div class="text-xl py-1">Hi there 👋</div>
+            <div class="text-4xl py-1 font-bold">I'm Hampus Sandén</div>
+            <div class="text-2xl py-1 font-bold">Freelance Consultant based in Stockholm, Sweden</div>
+            <div class="text-xl py-1">hampus (at) hampussanden.com</div>
+            <div class="py-2">
+              <text class="text-lg">
+                Welcome to my personal portfolio website where I write about my thoughts and learnings so far as a Data Analyst. 
+                I hope you find what I've shared useful!
+              </text>
+            </div>
+            <div class="mt-3 flex gap-1">
+              <a href="https://www.buymeacoffee.com/hampussanden" target="_blank"><FiCoffee size={28} className="mr-3"></FiCoffee></a>
+              <a href="https://github.com/hampussanden" target="_blank"><FiGithub size={28} className="mr-3"></FiGithub></a>
+              <a href="https://www.linkedin.com/in/hampussanden/" target="_blank"><FiLinkedin size={28} className="mr-3"></FiLinkedin></a>
+              <a href="https://twitter.com/hampussanden" target="_blank"><FiTwitter size={28} className="mr-3"></FiTwitter></a>
+            </div>
         </article>
         <div class="mb-6 text-2xl font-bold">
           <div class="flex items-baseline justify-between">

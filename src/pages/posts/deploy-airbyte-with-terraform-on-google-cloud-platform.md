@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1696585253601
+updatedAt: 1697453335790
 tags:
   - Google Cloud
   - Airbyte
@@ -27,38 +27,39 @@ If you want to get a production ready VM up and running in Google Cloud you have
 
 ## Architecture
 
-In this architecture we use a couple of different Google Cloud services to create a secure and scalable environment. 
+In this architecture we use a couple of different Google Cloud services to create a secure and scalable environment. We deploy our virtual machine (VM) with Google Compute Engine, while the services Virtual Private Cloud (VPC), Identity Aware Proxy (IAP), Cloud NAT, and Cloud Router are used to enhance security, networking, and accessibility.
 
-We deploy our virtual machine (VM) with Google Compute Engine, while the services Virtual Private Cloud (VPC), Identity Aware Proxy (IAP), Cloud NAT, and Cloud Router are used to enhance security, networking, and accessibility.
+### Services
 
-### Compute Engine
+#### Compute Engine
 
 Google Compute Engine is a Infrastructure as a Service (IaaS). It enables users to deploy and manage VM instances in the cloud. Compute Engine provides a scalable and flexible environment for running a wide range of applications.
 
-We deploy one VM with the following additional settings: 
+<details>
+  <summary>Read more<br />&nbsp;</summary>
+</details>
 
-- Our VM instance resides within a Virtual Private Cloud (VPC). Which enables us to create an isolated network environment that we access by the help of Cloud Router. 
+#### Virtual Private Cloud
 
-- We´ve also divided the VPC into a subnet, with its own IP range and routing configuration. This will help us in the future if we decide to add another VM instance to our VPC.
+A Virtual Private Cloud (VPC) is a network virtualisation technology provided by cloud platforms like Google Cloud Platform (GCP). It enables users to create isolated and customizable network environments within the cloud.
 
-- The VM instance have shielded futures enabled that incorporates advanced security features to enhance the protection and integrity of workloads and the firewall is configured to only let trough users coming from IAP.
-
-
-### Identity Aware Proxy
+#### Identity Aware Proxy
 
 Identity Aware Proxy (IAP) is a security feature that enhances the security of applications running on GCP. IAP allows you to control and manage access to your web applications by verifying the identity of users before granting access. 
 
-It acts as an additional layer of security for applications hosted on GCP by ensuring that only authenticated and authorized users can access them.
-
-### Cloud NAT
+#### Cloud NAT
 
 Cloud NAT (Network Address Translation) is a service that allows virtual machines VMs without external IP addresses to access the internet. It acts as a bridge between private, internal networks and the public internet.
 
-### Cloud Router
+#### Cloud Router
 
 Cloud Router is a networking service that allows for dynamic routing within virtual private cloud VPC networks. It enables communication between different VPC networks, as well as connections to on-premises networks.
 
-![Deploy Airbyte with Terraform on Google Cloud Platform](/posts/deploy-airbyte-with-terraform-on-google-cloud-platform_deploy-airbyte-with-terraform-on-google-cloud-platform.png)
+### Diagram
+
+Our VM instance resides within a Virtual Private Cloud (VPC). Which enables us to create an isolated network environment that we access by the help of Cloud Router. We´ve also divided the VPC into a subnet, with its own IP range and routing configuration. This will help us in the future if we decide to add another VM instance to our VPC. The VM instance have shielded futures enabled that incorporates advanced security features to enhance the protection and integrity of workloads and the firewall is configured to only let trough users coming from IAP.
+
+<div style="width: 100%; height: 480px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:100%; height:480px" src="https://lucid.app/documents/embedded/6887a3e1-c19c-43a8-ac8a-2fd7ef0bff63" id="Y5eDIC5OdKQV"></iframe></div>
 
 1. The user clicks the SSH button in the Google Cloud console or use the command `gcloud compute ssh <INSTANCE> --zone <ZONE> --tunnel-through-iap --project <PROJECT_ID>`
 2. The IAP connection authenticates and authorises the user if they have the IAM role `IAP-secured Tunnel User`.
@@ -166,7 +167,7 @@ gcloud projects add-iam-policy-binding <PROJECT_ID> \
 
 ### Install Terraform
 
-Follow the instructions [here](https://learn.hashicorp.com/tutorials/terraform/install-cli) to install the Terraform CLI locally. Run the following command afterward to check your installation: 
+Follow the instructions [here](https://learn.hashicorp.com/tutorials/terraform/install-cli) to install the Terraform CLI locally. Run the following command afterwards to check your installation: 
 
 ```shell
 terraform -v
@@ -206,7 +207,7 @@ zone = ""
 ```
 
 
-## Getting started
+## Setup
 
 ### Project overview
 

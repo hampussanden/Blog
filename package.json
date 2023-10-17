@@ -15,9 +15,10 @@
     "@astrojs/image": "^0.7.0",
     "@astrojs/react": "^1.1.2",
     "@astrojs/rss": "^1.0.1",
-    "@astrojs/sitemap": "^1.0.0",
+    "@astrojs/sitemap": "^1.4.0",
     "@astrojs/tailwind": "^1.0.1",
     "astro": "^1.2.3",
+    "daisyui": "^3.9.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-icons": "^4.4.0"
