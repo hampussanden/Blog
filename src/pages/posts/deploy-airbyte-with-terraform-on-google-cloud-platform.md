@@ -3,7 +3,7 @@ description: Deploy Airbyte with Terraform on Google Cloud Platform
 slug: deploy-airbyte-with-terraform-on-google-cloud-platform
 title: Deploy Airbyte with Terraform on Google Cloud Platform
 createdAt: 1695647703625
-updatedAt: 1697453335790
+updatedAt: 1697548327439
 tags:
   - Google Cloud
   - Airbyte
@@ -34,10 +34,6 @@ In this architecture we use a couple of different Google Cloud services to creat
 #### Compute Engine
 
 Google Compute Engine is a Infrastructure as a Service (IaaS). It enables users to deploy and manage VM instances in the cloud. Compute Engine provides a scalable and flexible environment for running a wide range of applications.
-
-<details>
-  <summary>Read more<br />&nbsp;</summary>
-</details>
 
 #### Virtual Private Cloud
 
